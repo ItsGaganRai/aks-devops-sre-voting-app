@@ -19,7 +19,8 @@ variables:
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  pool:
+   name: 'newazureagent'
 
 stages:
 - stage: Build
