@@ -8,7 +8,7 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: '892c1daa-b75a-41d0-9713-e64094d8a6c2'
+  dockerRegistryServiceConnection: 'acr-gaganazurecicd'
   imageRepository: 'resultapp'
   dockerfilePath: '$(Build.SourcesDirectory)/result/Dockerfile'
   tag: '$(Build.BuildId)'
