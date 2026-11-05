@@ -9,8 +9,8 @@ resources:
 
 variables:
   dockerRegistryServiceConnection: 'acr-gaganazurecicd'
-  imageRepository: 'resultapp'
-  dockerfilePath: '$(Build.SourcesDirectory)/result/Dockerfile'
+  imageRepository: 'workerapp'
+  dockerfilePath: '$(Build.SourcesDirectory)/worker/Dockerfile'
   tag: '$(Build.BuildId)'
 
 pool:
