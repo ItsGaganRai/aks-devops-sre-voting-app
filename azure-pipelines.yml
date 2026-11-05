@@ -1,26 +1,20 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
- paths:
-   include:
-     - 'result/*'
+  paths:
+    include:
+      - 'result/*'
 
 resources:
 - repo: self
 
 variables:
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '892c1daa-b75a-41d0-9713-e64094d8a6c2'
   imageRepository: 'resultapp'
-  containerRegistry: 'gaganazurecicd.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/result/Dockerfile'
   tag: '$(Build.BuildId)'
 
-  # Agent VM image name
 pool:
-   name: 'newazureagent'
+  name: 'newazureagent'
 
 stages:
 - stage: Build
@@ -28,7 +22,6 @@ stages:
   jobs:
   - job: Build
     displayName: Build
-    
     steps:
     - task: Docker@2
       displayName: Build the Image
@@ -42,17 +35,24 @@ stages:
 
 - stage: Push
   displayName: Push
+  dependsOn: Build
   jobs:
   - job: Push
     displayName: Push
-    
     steps:
+
+    # Authenticate to ACR again before pushing
+    - task: Docker@2
+      displayName: Login to Azure Container Registry
+      inputs:
+        command: 'login'
+        containerRegistry: $(dockerRegistryServiceConnection)
+
     - task: Docker@2
       displayName: Push the Image
       inputs:
         command: 'push'
         repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
