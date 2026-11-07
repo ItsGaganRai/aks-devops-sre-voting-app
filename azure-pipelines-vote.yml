@@ -58,13 +58,17 @@ stages:
           $(tag)
 
 - stage: Update
-  displayName: Update
+  displayName: Update Kubernetes Manifest
+  dependsOn: Push
   jobs:
-   - job: Update
-     displayName: Update
-     steps:
+  - job: Update
+    displayName: Update Manifest
+    steps:
+    - checkout: self
+      persistCredentials: true
 
-        - task: ShellScript@2
-          inputs:
-            scriptPath: 'scripts/updateK8sManifests.sh'
-            args: 'vote $imageRepository $tag'
+    - task: ShellScript@2
+      displayName: Update Vote Deployment Image
+      inputs:
+        scriptPath: 'scripts/updateK8sManifests.sh'
+        args: 'vote $(imageRepository) $(tag)'
