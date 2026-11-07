@@ -67,6 +67,13 @@ stages:
     - checkout: self
       persistCredentials: true
 
+    - task: Bash@3
+      displayName: Fix shell script line endings
+      inputs:
+        targetType: 'inline'
+        script: |
+          sed -i 's/\r$//' scripts/updateK8sManifests.sh
+
     - task: ShellScript@2
       displayName: Update Vote Deployment Image
       inputs:
