@@ -20,7 +20,7 @@ echo "New image: $IMAGE"
 cd "$BUILD_SOURCESDIRECTORY"
 
 # Update the image line
-sed -i -E "s|(^[[:space:]]*image:[[:space:]]*).*$|\1${IMAGE}|" "$MANIFEST"
+sed -i -E "s|(^[[:space:]]*-[[:space:]]*image:[[:space:]]*).*$|\1${IMAGE}|" "$MANIFEST"
 
 # Configure Git identity
 git config user.email "azure-pipelines@local"
