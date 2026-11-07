@@ -1,28 +1,38 @@
 #!/bin/bash
 
-set -x
+set -euo pipefail
 
-# Set the repository URL
-REPO_URL="https://7wd2mEBstulcYQLiyK7GgpI1pQwSUMtYM1DGASHip3VJxGknV3QrJQQJ99CJACAAAAAAAAAAAAASAZDOvCTw@dev.azure.com/<AZURE-DEVOPS-ORG-NAME>/voting-app/_git/voting-app"
+# Arguments passed from Azure Pipeline
+SERVICE="$1"
+IMAGE_REPOSITORY="$2"
+TAG="$3"
 
-# Clone the git repository into the /tmp directory
-git clone "$REPO_URL" /tmp/temp_repo
+# ACR image
+IMAGE="gaganazurecicd.azurecr.io/${IMAGE_REPOSITORY}:${TAG}"
 
-# Navigate into the cloned repository directory
-cd /tmp/temp_repo
+# Manifest path
+MANIFEST="k8s-specifications/${SERVICE}-deployment.yaml"
 
-# Make changes to the Kubernetes manifest file(s)
-# For example, let's say you want to change the image tag in a deployment.yaml file
-sed -i "s|image:.*|image: gaganazurecicd/$2:$3|g" k8s-specifications/$1-deployment.yaml
+echo "Updating manifest: $MANIFEST"
+echo "New image: $IMAGE"
 
-# Add the modified files
-git add .
+# Go to the checked-out repository
+cd "$BUILD_SOURCESDIRECTORY"
 
-# Commit the changes
-git commit -m "Update Kubernetes manifest"
+# Update the image line
+sed -i -E "s|(^[[:space:]]*image:[[:space:]]*).*$|\1${IMAGE}|" "$MANIFEST"
 
-# Push the changes back to the repository
-git push
+# Configure Git identity
+git config user.email "azure-pipelines@local"
+git config user.name "Azure Pipelines"
 
-# Cleanup: remove the temporary directory
-rm -rf /tmp/temp_repo
+# Stage only the modified manifest
+git add "$MANIFEST"
+
+# Commit the change
+git commit -m "Update ${SERVICE} image to ${TAG} [skip ci]"
+
+# Push to the branch that triggered the pipeline
+git push origin "HEAD:${BUILD_SOURCEBRANCH}"
+
+echo "Manifest update completed successfully."
